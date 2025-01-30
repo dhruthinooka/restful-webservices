@@ -90,6 +90,25 @@ public class UserJpaResource {
 			
 		}
 		
+		// GET /jpa/users/{id}/posts/{post_id}
+		// fetch the user first and then retrieve the specific post of that user
+		@GetMapping("/jpa/users/{id}/posts/{post_id}")
+		public Post retrieveSpecificPostOfUser(@PathVariable int id, @PathVariable int post_id) {
+
+			Optional<User> user = repository.findById(id);
+
+			if (user.isEmpty()) 
+				throw new UserNotFoundException("id:"+id);
+			
+			Post specificPostOfUser = postRepository.getSpecificPostOfUser(user.get(), post_id);
+			
+			if (specificPostOfUser == null)
+				throw new PostNotFoundForUserException("post_id:"+post_id + " for user id:" + id);
+				
+			return specificPostOfUser;
+			
+		}
+		
 		// POST /jpa/users/{id}/posts
 		// fetch the user first and then create the post for that user
 		@PostMapping("/jpa/users/{id}/posts")

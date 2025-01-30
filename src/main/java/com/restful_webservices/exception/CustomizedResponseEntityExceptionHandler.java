@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.restful_webservices.user.PostNotFoundForUserException;
 import com.restful_webservices.user.UserNotFoundException;
 
 @ControllerAdvice
@@ -25,15 +26,13 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@ExceptionHandler(UserNotFoundException.class)
-	public final ResponseEntity<ErrorDetails> handleUserNotFoundException(Exception ex, WebRequest request) throws Exception {
+	@ExceptionHandler({ UserNotFoundException.class, PostNotFoundForUserException.class })
+	public final ResponseEntity<ErrorDetails> handleUserOrPostNotFoundException(Exception ex, WebRequest request) throws Exception {
 		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
 		
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 	
-	// ex.getFieldError().getDefaultMessage() - returns 1st exception msg in case of multiple
-	// ex.getErrorCount() - returns total exceptions count
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 			MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
